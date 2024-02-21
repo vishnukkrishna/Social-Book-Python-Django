@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
-from django.contrib.auth.models import User,auth
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate,logout, login as auth_login
 from django.contrib import messages
 from .models import *
 from django.http import HttpResponse
@@ -41,3 +42,24 @@ def signup(request):
       return redirect('signup')
   else:
     return render(request, 'signup.html')
+  
+
+def signin(request):
+
+  if request.method == 'POST':
+    username = request.POST['username']
+    password = request.POST['password']
+
+    user = authenticate(request, username=username, password=password)
+
+    if user is not None:
+      auth_login(request, user)
+      return redirect('/')
+    else:
+      messages.info(request, "Credentials Invalid")
+      return redirect('signin')
+  else:
+    return render(request, 'signin.html')
+  
+
+
