@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,logout, login as auth_login
+from django.contrib.auth import authenticate,logout as auth_logout, login as auth_login
 from django.contrib import messages
 from .models import *
 from django.http import HttpResponse
@@ -62,4 +62,6 @@ def signin(request):
     return render(request, 'signin.html')
   
 
-
+def logout(request):
+  auth_logout(request)
+  return redirect('signin')
