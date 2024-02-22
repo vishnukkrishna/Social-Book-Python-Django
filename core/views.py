@@ -43,7 +43,6 @@ def settings(request):
   return render(request, 'setting.html', {'user_profile': user_profile})
 
 
-
 def signup(request):
 
   if request.method == 'POST':
