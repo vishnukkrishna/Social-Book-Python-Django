@@ -122,4 +122,6 @@ def upload(request):
     return redirect('/')
   
 
-  
+@login_required(login_url='signin')
+def like_post(request):
+  pass
