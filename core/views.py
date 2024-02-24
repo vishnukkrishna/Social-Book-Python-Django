@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import *
 from django.urls import reverse
+from itertools import chain
 from django.http import HttpResponse
 
 # Create your views here.
@@ -14,8 +15,23 @@ def index(request):
   user_object  = User.objects.get(username=request.user.username)
   user_profile = Profile.objects.get(user=user_object)
 
+  user_following_list = []
+  feed = []
+
+  user_following = FollowersCount.objects.filter(follower=request.user.username)
+
+  for users in user_following:
+    user_following_list.append(users.user)
+  
+  for usernames in user_following_list:
+    feed_lists = Post.objects.filter(user=usernames)
+    feed.append(feed_lists)
+
+  feed_lists = list(chain(*feed))
+
+
   posts = Post.objects.all()
-  return render(request, 'index.html', {'user_profile': user_profile, 'posts': posts})
+  return render(request, 'index.html', {'user_profile': user_profile, 'posts': feed_lists})
 
 
 @login_required(login_url='signin')
@@ -192,4 +208,27 @@ def follow(request):
   else:
     return redirect('/')
   
+
+@login_required(login_url='signin')
+def search(request):
+  user_object  = User.objects.get(username=request.user.username)
+  user_profile = Profile.objects.get(user=user_object)
+
+  if request.method == 'POST':
+    username    = request.POST['username']
+    username_object = User.objects.filter(username__icontains=username)
+
+    username_profile      = []
+    username_profile_list = []
+
+    for users in username_object:
+      username_profile.append(users.id)
+
+    for ids in username_profile:
+      profile_lists = Profile.objects.filter(id_user=ids)
+      username_profile_list.append(profile_lists)
+
+    username_profile_list = list(chain(*username_profile_list))
+  return render(request, 'search.html', {'user_profile': user_profile, 'username_profile_list': username_profile_list})
+
 
